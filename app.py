@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import TextLoader
@@ -28,7 +29,7 @@ splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=50)
 chunks = splitter.split_documents(documents)
 embeddings = FakeEmbeddings(size=384)
 knowledge_base = FAISS.from_documents(chunks, embeddings)
-llm = ChatGroq(model="llama-3.3-70b-versatile")
+llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     retriever=knowledge_base.as_retriever()
