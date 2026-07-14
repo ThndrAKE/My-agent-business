@@ -3,7 +3,7 @@ from langchain_groq import ChatGroq
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import FakeEmbeddings
 from langchain.chains import RetrievalQA
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
@@ -26,7 +26,7 @@ loader = TextLoader("faq.txt")
 documents = loader.load()
 splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=50)
 chunks = splitter.split_documents(documents)
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = FakeEmbeddings(size=384)
 knowledge_base = FAISS.from_documents(chunks, embeddings)
 llm = ChatGroq(model="llama-3.3-70b-versatile")
 qa_chain = RetrievalQA.from_chain_type(
