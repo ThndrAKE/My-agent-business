@@ -4,10 +4,17 @@ from langchain.schema import HumanMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 import os
+import csv
+from datetime import datetime
 
 load_dotenv()
 
 app = Flask(__name__)
+
+def log_conversation(question, answer):
+    with open("logs.csv", "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([datetime.now(), question, answer])
 
 with open("faq.txt", "r") as f:
     FAQ_CONTENT = f.read()
@@ -41,6 +48,7 @@ def ask():
         HumanMessage(content=data["message"])
     ]
     result = llm.invoke(messages)
+    log_conversation(data["message"], result.content)
     return jsonify({"reply": result.content})
 
 @app.route("/whatsapp", methods=["POST"])
@@ -51,6 +59,7 @@ def whatsapp():
         HumanMessage(content=incoming)
     ]
     result = llm.invoke(messages)
+    log_conversation(incoming, result.content)
     resp = MessagingResponse()
     resp.message(result.content)
     return str(resp)
